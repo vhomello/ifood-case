@@ -24,7 +24,10 @@ def select_offer(df):
     )
 
     return with_days_between.where(logic).select(
-        F.col("transaction_id"), F.lit(True).alias("is_offer"), F.col("offer_ended_at")
+        F.col("account_id"),
+        F.col("transaction_id"),
+        F.lit(True).alias("is_offer"),
+        F.col("offer_ended_at"),
     )
 
 
@@ -39,12 +42,13 @@ def select_non_offer(transactions):
 
     return (
         first_4_days.join(account_with_offer, on="account_id", how="left_anti")
-        .where(F.col("time_since_test_start") == 0)
         .select(
+            F.col("account_id"),
             F.col("transaction_id"),
             F.lit(False).alias("is_offer"),
             F.lit(0).alias("offer_ended_at"),
         )
+        .distinct()
     )
 
 
@@ -54,8 +58,8 @@ def get_rows(selected_offer, non_offer):
 
 def get_target(df, transactions):
     return (
-        df.alias("l")
-        .withColumn("censorship_end", F.col("offer_ended_at") + F.lit(4))
+        df.withColumn("censorship_end", F.col("offer_ended_at") + F.lit(4))
+        .alias("l")
         .join(
             transactions.alias("r")
             .where(F.col("event") == "transaction")
@@ -76,7 +80,7 @@ def join_all_dataframes(rows, target, transactions, profile, offers):
     transactions_cols = [
         "transaction_id",
         "offer_id",
-        "account_idtime_since_test_start",
+        "time_since_test_start",
     ]
 
     customer_cols = ["account_id", "age", "credit_card_limit", "gender", "account_age"]
@@ -95,9 +99,9 @@ def join_all_dataframes(rows, target, transactions, profile, offers):
 
     return (
         rows.join(target, "transaction_id", "inner")
-        .join(transactions.select(transactions_cols), on="transaction_id", how="inner")
-        .join(profile.select(customer_cols), on="account_id", how="inner")
-        .join(offers.select(offer_cols), on="offer_id", how="inner")
+        .join(transactions.select(transactions_cols), on="transaction_id", how="left")
+        .join(profile.select(customer_cols), on="account_id", how="left")
+        .join(offers.select(offer_cols), on="offer_id", how="left")
     )
 
 

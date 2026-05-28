@@ -22,3 +22,14 @@ The file `pyproject.toml` and `uv.lock` is used to manage dependencies and `requ
 ```
 uv export --format requirements-txt -o requirements.txt
 ```
+
+### Package Installation
+You can install the codebase as an editable package inside your environment by running:
+```bash
+pip install -e .
+```
+
+This registers the package, allowing you to import `data_processing` in your notebooks and Python scripts:
+```python
+from data_processing import read_profile_json, build_offer_lifecycle
+```

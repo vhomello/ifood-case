@@ -18,7 +18,7 @@ ifood-case/
 
 ## Setup
 This project uses `uv` for package and environment management
-The file `pyproject.toml` and `uv.lock` is used to manage dependencies and `requirements.txt` was using the following command
+The file `pyproject.toml` and `uv.lock` are used to manage dependencies and `requirements.txt` was generated using the following command
 ```
 uv export --format requirements-txt -o requirements.txt
 ```
@@ -29,7 +29,7 @@ You can install the codebase as an editable package inside your environment by r
 pip install -e .
 ```
 
-This registers the package, allowing you to import `data_processing` in your notebooks and Python scripts:
+This registers the package, allowing you to import modules of `ifood` in your notebooks and Python scripts:
 ```python
-from data_processing import read_profile_json, build_offer_lifecycle
+from ifood.data_processing.profile import read_profile_json
 ```
